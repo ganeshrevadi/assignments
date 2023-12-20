@@ -13,8 +13,32 @@ const app = express();
 
 let numberOfRequestsForUser = {};
 setInterval(() => {
-    numberOfRequestsForUser = {};
+  numberOfRequestsForUser = {};
 }, 1000)
+
+
+const reqCount = (req, res, next) => {
+  const userId = req.header('user-id');
+
+  // Initialize the count for the user if not present
+  numberOfRequestsForUser[userId] = (numberOfRequestsForUser[userId] || 0) + 1;
+
+  next();
+};
+
+// Middleware to rate limit requests per user
+const rateLimiter = (req, res, next) => {
+  const userId = req.header('user-id');
+
+  if (numberOfRequestsForUser[userId] > 5) {
+    res.status(404).send("You are blocked");
+  } else {
+    next();
+  }
+};
+
+app.use(reqCount, rateLimiter)
+
 
 app.get('/user', function(req, res) {
   res.status(200).json({ name: 'john' });
