@@ -1,24 +1,60 @@
 const { Router } = require("express");
 const router = Router();
 const userMiddleware = require("../middleware/user");
-
+const { Course } = require("../db");
+const express = require("express")
+const app = express()
 // User Routes
-app.post('/signup', (req, res) => {
-    // Implement user signup logic
+app.post('/signup', userMiddleware, (req, res) => {
+  // Implement user signup logic
+  User.create({
+    username: req.body.username,
+    password: req.body.password,
+  });
+
+  res.json({
+    message: `Admin created sucessfully`,
+  });
+
 });
 
-app.post('/signin', (req, res) => {
-    // Implement admin signup logic
+app.get('/courses', userMiddleware, (req, res) => {
+  // Implement listing all courses logic
+  Course.find().then(courses => {
+    res.json(courses)
+  })
+
 });
 
-app.get('/courses', (req, res) => {
-    // Implement listing all courses logic
+app.post('/courses/:courseId', userMiddleware, async (req, res) => {
+  try {
+    // Assuming you're passing course details in the request body
+    const { title, description, price, image } = req.body;
+
+    // Create a new course in the database
+    const newCourse = await Course.create({
+      title,
+      description,
+      price,
+      image,
+    });
+
+    res.json({ message: 'Course purchased successfully', courseId: newCourse._id });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
 });
 
-app.post('/courses/:courseId', userMiddleware, (req, res) => {
-    // Implement course purchase logic
-});
+// Route to implement fetching purchased courses logic
+app.get('/purchasedCourses', userMiddleware, async (req, res) => {
+  try {
+    // Fetch the courses purchased by the user from the database
+    const purchasedCourses = await Course.find({}); // Adjust the query based on your schema and requirements
 
-app.get('/purchasedCourses', userMiddleware, (req, res) => {
-    // Implement fetching purchased courses logic
+    res.json({ purchasedCourses });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
 });
