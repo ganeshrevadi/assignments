@@ -5,6 +5,7 @@ const { Course } = require("../db");
 const express = require("express")
 const app = express()
 // User Routes
+<<<<<<< HEAD
 app.post('/signup', userMiddleware, (req, res) => {
   // Implement user signup logic
   User.create({
@@ -57,4 +58,26 @@ app.get('/purchasedCourses', userMiddleware, async (req, res) => {
     console.error(error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
+=======
+router.post('/signup', (req, res) => {
+    // Implement user signup logic
 });
+
+router.post('/signin', (req, res) => {
+    // Implement admin signup logic
+});
+
+router.get('/courses', (req, res) => {
+    // Implement listing all courses logic
+});
+
+router.post('/courses/:courseId', userMiddleware, (req, res) => {
+    // Implement course purchase logic
+});
+
+router.get('/purchasedCourses', userMiddleware, (req, res) => {
+    // Implement fetching purchased courses logic
+>>>>>>> 44221a6567c34bcb8321268b6c0180e2a2a48d63
+});
+
+module.exports = router
