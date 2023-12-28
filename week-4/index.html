@@ -8,6 +8,7 @@
     let oldTodoState = [];
 
     function addTodoToDom() {
+     var elementToAdd = document.getElementById("todos")
       
     }
 
@@ -28,6 +29,36 @@
       const added = [];
       const deleted = [];
       const updated = [];
+
+      const oldTodos = oldTodoState;
+
+
+      newTodos.forEach(newTodo => {
+        const oldTodoIndex = oldTodo.findIndex(oldTodo => oldTodo.id == newTodo.id);
+        
+
+        if(oldTodoIndex == -1){
+          added.push(newTodo);
+        }
+        else{
+         const oldTodo = oldTodos[oldTodoIndex];
+
+         if (!isEqual(oldTodo, newTodo)) {
+          updated.push(newTodo); 
+        }
+      });
+
+      oldTodos.forEach(oldTodo => {
+        const isDeleted = !newTodos.some(newTodo => newTodo.id == oldTodo.id);
+
+        if(isDeleted){
+          deleted.push(oldTodo)
+        }
+      });
+
+      added.forEach(addTodoToDom);
+      updated.forEach(updatedTodo => updateTodoInDom(updatedTodo))
+      deleted.forEach(deleted => removeTodoFromDom(deleted))
       // calculate these 3 arrays
       // call addTodo, removeTodo, updateTodo functions on each of the
       // elements
