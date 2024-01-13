@@ -1,54 +1,56 @@
-const { Router } = require("express");
 const adminMiddleware = require("../middleware/admin");
-const router = Router();
 const express = require("express");
-const { Admin, Course } = require("../db");
-const app = express();
+const { Admin } = require("../db");
+const router = express.Router();
 
-app.use(express.json());
-
-// Admin Routes
-<<<<<<< HEAD
-app.post("/signup", (req, res) => {
-  Admin.create({
-    username: req.body.username,
-    password: req.body.password
-  })
-
-  res.json({
-    message: `Admin created sucessfully`
-  })
-
-});
-
-app.post("/courses", adminMiddleware, (req, res) => {
-  // Implement course creation logic
-  Course.create({
-    title: req.body.title,
-    description: req.body.description,
-    price: req.body.price,
-    image: req.body.image
-  })
-
-});
-
-app.get("/courses", adminMiddleware, (req, res) => {
-  // Implement fetching all courses logic
-  Course.find().then(courses => {
-    res.json(courses)
-  })
-=======
 router.post('/signup', (req, res) => {
-    // Implement admin signup logic
+  // Implement admin signup logic
+  const username = req.body.username;
+  const password = req.body.password;
+
+  Admin.create({
+    username,
+    password
+  })
+    .then(function() {
+      res.json({
+        message: 'Admin Created Sucessfully'
+      })
+    })
 });
 
 router.post('/courses', adminMiddleware, (req, res) => {
-    // Implement course creation logic
+  // Implement course creation logic
+  const title = req.body.title;
+  const description = req.body.description;
+  const imageLink = req.body.imageLink;
+  const price = req.body.price;
+
+  const newCourse = Course.create({
+    title,
+    description,
+    imageLink,
+    price
+  })
+    .then(function() {
+      res.json({
+        message: "Course created Sucessfully",
+        courseId: newCourse._id
+      })
+    })
+
+
 });
 
 router.get('/courses', adminMiddleware, (req, res) => {
-    // Implement fetching all courses logic
->>>>>>> 44221a6567c34bcb8321268b6c0180e2a2a48d63
+  // Implement fetching all courses logic
+  const allCourses = Course.find({})
+  .then(function(){
+    res.json({
+      courses: allCourses
+    })
+  })
+
 });
 
 module.exports = router;

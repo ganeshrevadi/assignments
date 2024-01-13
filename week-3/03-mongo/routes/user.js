@@ -1,79 +1,74 @@
 const { Router } = require("express");
 const router = Router();
 const userMiddleware = require("../middleware/user");
-const { Course } = require("../db");
+const { Course, User } = require("../db");
 const express = require("express")
 const app = express()
 // User Routes
-<<<<<<< HEAD
-app.post('/signup', userMiddleware, (req, res) => {
+// Route to implement fetching purchased courses logic
+router.post('/signup', (req, res) => {
   // Implement user signup logic
-  User.create({
-    username: req.body.username,
-    password: req.body.password,
-  });
+  const username = req.body.username;
+  const password = req.body.password;
 
-  res.json({
-    message: `Admin created sucessfully`,
-  });
+  User.create({
+    username,
+    password
+  })
+    .then(function() {
+      res.json({
+        message: 'User Created Sucessfully'
+      })
+    })
 
 });
 
-app.get('/courses', userMiddleware, (req, res) => {
+router.get('/courses', async (req, res) => {
   // Implement listing all courses logic
-  Course.find().then(courses => {
-    res.json(courses)
+  // Implement fetching all courses logic
+  const response = await Course.find({});
+
+  res.json({
+    courses: response
+  })
+});
+
+router.post('/courses/:courseId', userMiddleware, (req, res) => {
+  // Implement course purchase logic
+  const courseId = req.params.courseId;
+  const username = req.headers.username;
+  User.updateOne({
+    username: username
+  },
+    {
+      "$push": {
+        purchasedCourses: courseId
+      }
+
+    })
+
+  res.json({
+    message: "Purchase Complete"
   })
 
 });
 
-app.post('/courses/:courseId', userMiddleware, async (req, res) => {
-  try {
-    // Assuming you're passing course details in the request body
-    const { title, description, price, image } = req.body;
+router.get('/purchasedCourses', userMiddleware, async (req, res) => {
+  // Implement fetching purchased courses logic
+  const user = await User.findOne({
+    username: req.headers.username
+  });
 
-    // Create a new course in the database
-    const newCourse = await Course.create({
-      title,
-      description,
-      price,
-      image,
-    });
+  console.log(user.purchasedCourses);
+  const courses = await Course.find({
+    _id: {
+      "$in": user.purchasedCourses
+    }
+  });
 
-    res.json({ message: 'Course purchased successfully', courseId: newCourse._id });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Internal Server Error' });
-  }
-});
-
-// Route to implement fetching purchased courses logic
-app.get('/purchasedCourses', userMiddleware, async (req, res) => {
-  try {
-    // Fetch the courses purchased by the user from the database
-    const purchasedCourses = await Course.find({}); // Adjust the query based on your schema and requirements
-
-    res.json({ purchasedCourses });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Internal Server Error' });
-  }
-=======
-router.post('/signup', (req, res) => {
-    // Implement user signup logic
-});
-
-router.get('/courses', (req, res) => {
-    // Implement listing all courses logic
-});
-
-router.post('/courses/:courseId', userMiddleware, (req, res) => {
-    // Implement course purchase logic
-});
-
-router.get('/purchasedCourses', userMiddleware, (req, res) => {
-    // Implement fetching purchased courses logic
->>>>>>> 44221a6567c34bcb8321268b6c0180e2a2a48d63
+  res.json({
+    courses: courses
+  })
 });
 
 module.exports = router

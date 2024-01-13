@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 // Connect to MongoDB
 
-const db = mongoose.connect('mongourl');
+const db = mongoose.connect('mongodb+srv://admin:7n8hmhd8kw@cluster0.qp9lisl.mongodb.net/');
 db.then(() => {
   console.log("Mongo Connected Sucessfull!!")
 })
@@ -16,14 +16,18 @@ const AdminSchema = new mongoose.Schema({
 
 const UserSchema = new mongoose.Schema({
   username: String,
-  password: String
+  password: String,
+  purchasedCourses: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Course'
+  }]
 });
 
 const CourseSchema = new mongoose.Schema({
   title: String,
   description: String,
   price: Number,
-  image: String,
+  imageLink: String,
 });
 
 const Admin = mongoose.model('Admin', AdminSchema);
