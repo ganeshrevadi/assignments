@@ -10,11 +10,11 @@ import { client } from "..";
  * }
  */
 export async function createTodo(userId: number, title: string, description: string) {
-  await client.connect()
-  const insertQuery = "INSERT INTO todos (user_id , title , description) VALUES ($1 , $2 , $3)"
+  const insertQuery = "INSERT INTO todos (user_id , title , description) VALUES ($1 , $2 , $3) RETURNING *"
   const values = [userId, title, description]
   const res = await client.query(insertQuery, values)
-  return res;
+  console.log(res.rows[0])
+  return res.rows[0];
 }
 /*
  * mark done as true for this specific todo.
@@ -27,11 +27,11 @@ export async function createTodo(userId: number, title: string, description: str
  * }
  */
 export async function updateTodo(todoId: number) {
-  await client.connect()
-  const query = "UPDATE todos SET done = $1 WHERE id = $2"
+  const query = "UPDATE todos SET done = ($1) WHERE id = ($2)"
   const values = [true, todoId]
   const res = await client.query(query, values)
-  return res;
+  console.log(res.rows[0])
+  return res.rows[0];
 }
 
 /*
@@ -46,9 +46,9 @@ export async function updateTodo(todoId: number) {
  */
 export async function getTodos(userId: number) {
 
-  await client.connect()
-  const getQuery = "SELECT * FROM todos WHERE user_id = $1"
+  const getQuery = "SELECT * FROM todos WHERE user_id = ($1)"
   const values = [userId]
   const res = await client.query(getQuery, values)
-  return res;
+  console.log(res.rows)
+  return res.rows;
 }
