@@ -10,11 +10,17 @@ import { client } from "..";
  * }
  */
 export async function createTodo(userId: number, title: string, description: string) {
-  const insertQuery = "INSERT INTO todos (user_id , title , description) VALUES ($1 , $2 , $3) RETURNING *"
-  const values = [userId, title, description]
-  const res = await client.query(insertQuery, values)
-  console.log(res.rows[0])
-  return res.rows[0];
+  try {
+    //await client.connect();
+    const createTodoQuery = "INSERT INTO todos (user_id, title, description) VALUES ($1, $2, $3) RETURNING *";
+    const values = [userId, title, description];
+    const res = await client.query(createTodoQuery, values);
+    return res.rows[0];
+  } catch (err) {
+    console.error("Createtodo error has occurred: ", err);
+  } finally {
+    //await client.end();
+  }
 }
 /*
  * mark done as true for this specific todo.
@@ -27,11 +33,18 @@ export async function createTodo(userId: number, title: string, description: str
  * }
  */
 export async function updateTodo(todoId: number) {
-  const query = "UPDATE todos SET done = ($1) WHERE id = ($2)"
-  const values = [true, todoId]
-  const res = await client.query(query, values)
-  console.log(res.rows[0])
-  return res.rows[0];
+  try {
+    //await client.connect();
+    const updateTodoQuery = "UPDATE todos SET done = ($1) WHERE id = ($2) RETURNING *";
+    const values = [true, todoId];
+    const res = await client.query(updateTodoQuery, values);
+    console.log(res.rows[0]);
+    return res.rows[0];
+  } catch (err) {
+    console.error("Update todo Error has occurred: ", err);
+  } finally {
+    //await client.end();
+  }
 }
 
 /*
@@ -45,10 +58,9 @@ export async function updateTodo(todoId: number) {
  * }]
  */
 export async function getTodos(userId: number) {
-
-  const getQuery = "SELECT * FROM todos WHERE user_id = ($1)"
-  const values = [userId]
-  const res = await client.query(getQuery, values)
-  console.log(res.rows)
+  const getTodosQuery = "SELECT * FROM todos WHERE user_id = ($1)";
+  const values = [userId];
+  const res = await client.query(getTodosQuery, values);
+  console.log(res.rows);
   return res.rows;
 }
